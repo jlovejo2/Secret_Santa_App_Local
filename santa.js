@@ -4,7 +4,8 @@ require('dotenv').config();
 const nodemailer = require('nodemailer');
 const { participants } = require('./config.js');
 
-const DRY_RUN = true;
+const DRY_RUN = false;
+const groups_on = false;
 
 const YOUR_EMAIL = process.env.GMAIL_USER;
 const YOUR_APP_PASSWORD = process.env.GMAIL_APP_PASSWORD;
@@ -53,11 +54,13 @@ function createAssignments() {
         break;
       }
 
-      // rule 2 can't get someone in your group
-      if (giver.group && receiver.group && giver.group === receiver.group) {
-        console.log(`...Group conflict: ${giver.name} (${giver.group}) can't get ${receiver.name} (${receiver.group}). Re-shuffling.`);
-        hasInvalidAssignment = true;
-        break;
+      if (groups_on) {
+        // rule 2 can't get someone in your group
+        if (giver.group && receiver.group && giver.group === receiver.group) {
+          console.log(`...Group conflict: ${giver.name} (${giver.group}) can't get ${receiver.name} (${receiver.group}). Re-shuffling.`);
+          hasInvalidAssignment = true;
+          break;
+        }
       }
     }
   }
@@ -95,7 +98,7 @@ async function sendEmails(assignments) {
     const mailOptions = {
       from: `"Secret Santa Bot" <${YOUR_EMAIL}>`,
       to: giver.email,
-      subject: 'I Think I Did It .... Your Secret Santa Assignment is Here! 🎅',
+      subject: 'Couples turned on .... Your Secret Santa Assignment is Here! 🎅',
       text: `Hi ${giver.name}!\n\nYou are the Secret Santa for...\n\n** ${receiver.name} **\n\nShhhh, it's a secret!\n\nHappy holidays!`,
       html: `
         <div style="font-family: Arial, sans-serif; line-height: 1.6;">
