@@ -4,11 +4,37 @@ require('dotenv').config();
 const nodemailer = require('nodemailer');
 const { participants } = require('./config.js');
 
-const DRY_RUN = false;
-const groups_on = false;
+
 
 const YOUR_EMAIL = process.env.GMAIL_USER;
 const YOUR_APP_PASSWORD = process.env.GMAIL_APP_PASSWORD;
+
+const args = process.argv.slice(2);
+
+const DRY_RUN = args.includes('--dry-run') || args.includes('-d') ? true : false;
+const groups_on = args.includes('--groups') || args.includes('-g') ? true : false;
+
+if (args.includes('--help') || args.includes('-h')) {
+  console.log(`
+  🎅 Secret Santa Script 🎅
+
+  This script runs a Secret Santa draw and emails the results to participants.
+
+  Usage:
+    node santa.js [options]
+
+  Options:
+    -d, --dry-run       Run the script without sending any emails.
+                        (Prints assignments to the console)
+    
+    -g, --group-check   Enable the group exclusion rule.
+                        (Prevents people in the same 'group' from
+                        being assigned to each other)
+    
+    -h, --help          Show this help menu.
+  `);
+  process.exit(0); // <-- This is key! It stops the script immediately.
+}
 
 /**
  * Shuffles an array in place using the Fisher-Yates algorithm.
