@@ -4,10 +4,8 @@ require('dotenv').config();
 const nodemailer = require('nodemailer');
 const { participants } = require('./config.js');
 
-
-
 const YOUR_EMAIL = process.env.GMAIL_USER;
-const YOUR_APP_PASSWORD = process.env.GMAIL_APP_PASSWORD;
+const YOUR_APP_PASSWORD = process.env.GMAIL_APP_PASS;
 
 const args = process.argv.slice(2);
 
@@ -71,7 +69,7 @@ function createAssignments() {
       const giver = givers[i];
       const receiver = receivers[i];
 
-      console.log(`Checking assignment: ${giver.name} -> ${receiver.name}`);
+      if (DRY_RUN) console.log(`Checking assignment: ${giver.name} -> ${receiver.name}`);
 
       // rule 1 can't get yourself
       if (giver.uid === receiver.uid) {
@@ -124,7 +122,7 @@ async function sendEmails(assignments) {
     const mailOptions = {
       from: `"Secret Santa Bot" <${YOUR_EMAIL}>`,
       to: giver.email,
-      subject: 'Couples turned on .... Your Secret Santa Assignment is Here! 🎅',
+      subject: 'Your Secret Santa Assignment is Here! 🎅',
       text: `Hi ${giver.name}!\n\nYou are the Secret Santa for...\n\n** ${receiver.name} **\n\nShhhh, it's a secret!\n\nHappy holidays!`,
       html: `
         <div style="font-family: Arial, sans-serif; line-height: 1.6;">
@@ -136,6 +134,7 @@ async function sendEmails(assignments) {
           </div>
           <p>Shhhh, it's a secret!</p>
           <p>Happy holidays,<br>The Secret Santa Bot 🤖</p>
+          <p>-P.S. This probably isn't a scam but if you want to be sure respond to this email with your SSN and/or bank PIN.  Please and thank you!</p>
         </div>
       `,
     };
